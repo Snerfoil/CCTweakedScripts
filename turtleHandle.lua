@@ -11,6 +11,7 @@ end
 
 delay = 0
 reply = {}
+replyData = {}
 
 seconds = 10
 defaultAction = {"nothing","left",0,"Sample Text"}
@@ -31,10 +32,10 @@ function turtleHandleFunct(x)
     --in my notes.
     --stuff that isnt formmated
     --correctly returns all nil
-    print(x[1])
-    print(x[2])
-    print(x[3])
-    print(x[4])
+    print(x[1]) -- command name
+    print(x[2]) -- direction
+    print(x[3]) -- ammount
+    print(x[4]) -- context
     print("===")
     
     --TODO: finish all of the actions. nuff said.
@@ -42,25 +43,26 @@ function turtleHandleFunct(x)
     switch( x[1],
     case( "move"      , function() moveAction(x)      end),
     case( "dig"       , function() digAction(x)       end),
-    case( "place"     , function() print("place")     end),
-    case( "drop"      , function() print("drop")      end),
-    case( "attack"    , function() print("attack")    end),
-    case( "suck"      , function() print("succ")      end),
-    case( "select"    , function() print("select")    end),
-    case( "refuel"    , function() print("refuel")    end),
-    case( "equip"     , function() print("equip")     end),
-    case( "craft"     , function() print("craft")     end),
-    case( "swapTo"    , function() print("swapTo")    end),
-    case( "poke"      , function() print("poke")      end),
+    case( "place"     , function() placeAction(x)     end),
+    case( "drop"      , function() dropAction(x)      end),
+    case( "attack"    , function() attackAction(x)    end),
+    case( "suck"      , function() suckAction(x)      end),
+    case( "select"    , function() turtle.select(x[2])end),
+    case( "refuel"    , function() turtle.refuel()    end),
+    case( "equip"     , function() equipAction(x)     end),
+    case( "craft"     , function() craftAction(x)     end),
+    case( "inspect"   , function() inspectAction(x)   end),
+    case( "swapTo"    , function() print("swapTo")    end), -- moves items with transferTo
+    case( "poke"      , function() print("poke")      end), -- idk what this was ment to do.
     case( "shutdown"  , function() print("shutdown")  end),
-    case( "reboot"    , function() print("reboot")    end),
+    case( "reboot"    , function() print("reboot")    end), 
     case( "setLabel"  , function() print("setLabel")  end),
     case( "cd"        , function() print("cd")        end),
     case( "setDispMsg", function() print("setDispMsg")end),
     case( "getDir"    , function() print("getDir")    end),
     default(       function() print("nothin") end)
     )
-end    
+end
 
 function moveAction(x)
     --BUG: movement functions can only do single steps.
@@ -88,7 +90,83 @@ function digAction(x)
     case( "right"  , function() turtle.turnRight(1); turtle.dig(); turtle.turnLeft(1)  end),
     case( "back"   , function() turtle.turnLeft(1); turtle.turnLeft(1); turtle.dig(); turtle.turnLeft(1); turtle.turnLeft(1) end),
     default( function() turtle.back(0) end)
-    ) 
+    )
+end
+
+function placeAction(x)
+    switch( x[2],
+    case( "up"     , function() turtle.placeUp()   end),
+    case( "down"   , function() turtle.placeDown() end),
+    case( "forward", function() turtle.place()     end),
+    case( "left"   , function() turtle.turnLeft(1); turtle.place(); turtle.turnRight(1)  end),
+    case( "right"  , function() turtle.turnRight(1); turtle.place(); turtle.turnLeft(1)  end),
+    case( "back"   , function() turtle.turnLeft(1); turtle.turnLeft(1); turtle.place(); turtle.turnLeft(1); turtle.turnLeft(1) end),
+    default( function() turtle.back(0) end)
+    )
+end
+
+function dropAction(x)
+    switch( x[2],
+    case( "up"     , function() turtle.dropUp(x[3])   end),
+    case( "down"   , function() turtle.dropDown(x[3]) end),
+    case( "forward", function() turtle.drop(x[3])     end),
+    case( "left"   , function() turtle.turnLeft(1); turtle.drop(x[3]); turtle.turnRight(1)  end),
+    case( "right"  , function() turtle.turnRight(1); turtle.drop(x[3]); turtle.turnLeft(1)  end),
+    case( "back"   , function() turtle.turnLeft(1); turtle.turnLeft(1); turtle.drop(); turtle.turnLeft(1); turtle.turnLeft(1) end),
+    default( function() turtle.back(0) end)
+    )
+end
+
+function attackAction(x)
+    switch( x[2],
+    case( "up"     , function() turtle.attackUp(x[4])   end),
+    case( "down"   , function() turtle.attackDown(x[4]) end),
+    case( "forward", function() turtle.attack(x[4])     end),
+    case( "left"   , function() turtle.turnLeft(1); turtle.attack(x[4]); turtle.turnRight(1)  end),
+    case( "right"  , function() turtle.turnRight(1); turtle.attack(x[4]); turtle.turnLeft(1)  end),
+    case( "back"   , function() turtle.turnLeft(1); turtle.turnLeft(1); turtle.attack(x[4]); turtle.turnLeft(1); turtle.turnLeft(1) end),
+    default( function() turtle.back(0) end)
+    )
+end
+
+function suckAction(x)
+    switch( x[2],
+    case( "up"     , function() turtle.suckUp(x[3])   end),
+    case( "down"   , function() turtle.suckDown(x[3]) end),
+    case( "forward", function() turtle.suck(x[3])     end),
+    case( "left"   , function() turtle.turnLeft(1); turtle.suck(x[3]); turtle.turnRight(1)  end),
+    case( "right"  , function() turtle.turnRight(1); turtle.suck(x[3]); turtle.turnLeft(1)  end),
+    case( "back"   , function() turtle.turnLeft(1); turtle.turnLeft(1); turtle.suck(x[3]); turtle.turnLeft(1); turtle.turnLeft(1) end),
+    default( function() turtle.back(0) end)
+    )
+end
+
+function equipAction(x)
+    switch( x[2],
+    case( "left"   , function() turtle.equipLeft()   end),
+    case( "right"  , function() turtle.equipRight()  end),
+    default( function() turtle.back(0) end)
+    )
+end
+
+function craftAction(x)
+    if(turtle.craft ~= nil)
+    then do
+        turtle.craft(x[3])
+        end
+    end
+end
+
+function inspectAction(x)
+    switch( x[2],
+    case( "up"     , function() replyData={turtle.inspectUp()}   end),
+    case( "down"   , function() replyData={turtle.inspectDown()} end),
+    case( "forward", function() replyData={turtle.inspect()}     end),
+    case( "left"   , function() turtle.turnLeft(1); replyData={turtle.inspect()}; turtle.turnRight(1)  end),
+    case( "right"  , function() turtle.turnRight(1); replyData={turtle.inspect()}; turtle.turnLeft(1)  end),
+    case( "back"   , function() turtle.turnLeft(1); turtle.turnLeft(1); replyData={turtle.inspect()}; turtle.turnLeft(1); turtle.turnLeft(1) end),
+    default( function() replyData={turtle.getItemDetail(x[2])} end)
+    )
 end
 
 --loop cycle
@@ -99,9 +177,11 @@ do
     if(status == 1)
     then do
         pcall(turtleHandleFunct,reply[5])
-    end
+        end
     else do
         pcall(turtleHandleFunct,defaultAction)
+        end
     end
-    end    
+    -- reply with stored info.
+    sendMsg(reply[4],targPort,replyData)
 end
